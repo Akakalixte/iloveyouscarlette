@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>...</title>
+    <title>Escape</title>
     <style>
         * {
             margin: 0;
@@ -13,14 +13,323 @@
 
         body {
             background: #000;
-            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        #text-container {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            font-size: 28px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        #text-container.show {
+            opacity: 1;
+        }
+
+        #text-container.fade-out {
+            opacity: 0;
+        }
+
+        #exit-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 60px;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1s;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        #exit-button.show {
+            opacity: 1;
+        }
+
+        #exit-button:hover {
+            animation: glitchButton 0.1s infinite;
+        }
+
+        #exit-button:hover::before,
+        #exit-button:hover::after {
+            content: 'exit';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px 60px;
+        }
+
+        #exit-button:hover::before {
+            animation: glitchRed 0.2s infinite;
+            color: #ff0000;
+            z-index: -1;
+        }
+
+        #exit-button:hover::after {
+            animation: glitchBlue 0.3s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitchButton {
+            0% {
+                transform: translate(-50%, -50%);
+                filter: hue-rotate(0deg);
+            }
+            20% {
+                transform: translate(calc(-50% - 5px), calc(-50% + 5px));
+                filter: hue-rotate(90deg);
+            }
+            40% {
+                transform: translate(calc(-50% + 3px), calc(-50% - 3px));
+                filter: hue-rotate(180deg);
+            }
+            60% {
+                transform: translate(calc(-50% - 2px), calc(-50% - 4px));
+                filter: hue-rotate(270deg);
+            }
+            80% {
+                transform: translate(calc(-50% + 4px), calc(-50% + 2px));
+                filter: hue-rotate(45deg);
+            }
+            100% {
+                transform: translate(-50%, -50%);
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        @keyframes glitchRed {
+            0% {
+                transform: translate(-3px, -3px);
+                opacity: 0.8;
+            }
+            25% {
+                transform: translate(5px, 2px);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translate(-2px, 4px);
+                opacity: 0.9;
+            }
+            75% {
+                transform: translate(4px, -2px);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-3px, 3px);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes glitchBlue {
+            0% {
+                transform: translate(3px, 3px);
+                opacity: 0.7;
+            }
+            33% {
+                transform: translate(-4px, -2px);
+                opacity: 0.8;
+            }
+            66% {
+                transform: translate(2px, -4px);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(3px, 2px);
+                opacity: 0.7;
+            }
+        }
+
+        #exit-button:hover {
+            box-shadow: 
+                0 0 20px rgba(255, 0, 0, 0.5),
+                0 0 40px rgba(0, 255, 255, 0.5),
+                0 0 60px rgba(255, 255, 0, 0.3);
+            animation: glitchButton 0.1s infinite, glitchText 0.15s infinite;
+        }
+
+        @keyframes glitchText {
+            0% {
+                text-shadow: 
+                    -2px -2px 0 #ff0000,
+                    2px 2px 0 #00ffff,
+                    0 0 10px #ffff00;
+            }
+            25% {
+                text-shadow: 
+                    2px -2px 0 #ff0000,
+                    -2px 2px 0 #00ffff,
+                    3px 0 15px #ffff00;
+            }
+            50% {
+                text-shadow: 
+                    -3px 2px 0 #ff0000,
+                    3px -2px 0 #00ffff,
+                    -2px 0 20px #ffff00;
+            }
+            75% {
+                text-shadow: 
+                    2px 3px 0 #ff0000,
+                    -2px -3px 0 #00ffff,
+                    0 3px 15px #ffff00;
+            }
+            100% {
+                text-shadow: 
+                    -2px -2px 0 #ff0000,
+                    2px 2px 0 #00ffff,
+                    0 0 10px #ffff00;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Page vierge -->
+    <div id="text-container"></div>
+    <button id="exit-button" style="display: none;">exit</button>
+
+    <audio id="typeSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
+    <script>
+        // Fullscreen au chargement avec gestion du clic utilisateur
+        let fullscreenAttempted = false;
+        
+        function tryFullscreen() {
+            if (!fullscreenAttempted) {
+                fullscreenAttempted = true;
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(err => {
+                        console.log('Fullscreen nécessite une interaction utilisateur');
+                    });
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', tryFullscreen);
+        document.addEventListener('click', tryFullscreen, { once: true });
+
+        // Texte à afficher
+        const text = `Did you really think I was just going to do that?
+No.
+You're going to have to escape.
+I have faith in you, I know you can do it.`;
+
+        const textContainer = document.getElementById('text-container');
+        const exitButton = document.getElementById('exit-button');
+
+        // Système audio amélioré
+        let audioContext;
+        let audioInitialized = false;
+
+        function initAudio() {
+            if (!audioInitialized) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioInitialized = true;
+            }
+        }
+
+        // Fonction pour jouer un son de touche de machine à écrire
+        function playTypeSound() {
+            initAudio();
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Son plus réaliste de machine à écrire
+            oscillator.frequency.value = 600 + Math.random() * 400;
+            oscillator.type = 'square';
+            
+            filter.type = 'lowpass';
+            filter.frequency.value = 2000;
+            
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.08);
+        }
+
+        // Animation de la machine à écrire
+        async function typeWriter() {
+            // Initialiser l'audio au premier caractère
+            initAudio();
+            
+            textContainer.classList.add('show');
+            
+            for (let i = 0; i < text.length; i++) {
+                textContainer.textContent = text.substring(0, i + 1);
+                
+                // Jouer le son seulement pour les caractères visibles (pas les espaces)
+                if (text[i] !== ' ' && text[i] !== '\n') {
+                    try {
+                        playTypeSound();
+                    } catch (e) {
+                        console.log('Audio error:', e);
+                    }
+                }
+                
+                // Vitesse variable pour plus de réalisme
+                const delay = text[i] === '\n' ? 400 : 
+                             text[i] === '.' ? 300 :
+                             text[i] === ',' ? 200 :
+                             50 + Math.random() * 50;
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            
+            // Pause avant de faire disparaître le texte
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Faire disparaître le texte
+            textContainer.classList.add('fade-out');
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Afficher le bouton
+            textContainer.style.display = 'none';
+            exitButton.style.display = 'block';
+            setTimeout(() => {
+                exitButton.classList.add('show');
+            }, 50);
+        }
+
+        // Lancer l'animation après un court délai
+        setTimeout(typeWriter, 500);
+
+        // Action du bouton exit
+        exitButton.addEventListener('click', () => {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }
+        });
+    </script>
 </body>
 </html>
