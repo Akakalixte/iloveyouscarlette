@@ -45,17 +45,90 @@
         }
 
         @keyframes glitchScreen {
-            0% { background: #000; }
-            10% { background: #fff; }
-            20% { background: #f00; }
-            30% { background: #0ff; }
-            40% { background: #000; }
-            50% { background: #fff; }
-            60% { background: #ff0; }
-            70% { background: #000; }
-            80% { background: #0f0; }
-            90% { background: #000; }
-            100% { background: #fff; }
+            0% { 
+                background: #000;
+                transform: translate(0, 0);
+            }
+            5% { 
+                background: #fff;
+                transform: translate(-10px, 5px);
+            }
+            10% { 
+                background: #f00;
+                transform: translate(5px, -8px);
+            }
+            15% { 
+                background: #000;
+                transform: translate(-8px, -5px);
+            }
+            20% { 
+                background: #0ff;
+                transform: translate(10px, 8px);
+            }
+            25% { 
+                background: #000;
+                transform: translate(-5px, 10px);
+            }
+            30% { 
+                background: #ff0;
+                transform: translate(8px, -10px);
+            }
+            35% { 
+                background: #000;
+                transform: translate(-10px, 5px);
+            }
+            40% { 
+                background: #fff;
+                transform: translate(5px, -5px);
+            }
+            45% { 
+                background: #f0f;
+                transform: translate(-8px, 8px);
+            }
+            50% { 
+                background: #000;
+                transform: translate(10px, -8px);
+            }
+            55% { 
+                background: #0f0;
+                transform: translate(-10px, -10px);
+            }
+            60% { 
+                background: #fff;
+                transform: translate(8px, 5px);
+            }
+            65% { 
+                background: #00f;
+                transform: translate(-5px, -8px);
+            }
+            70% { 
+                background: #000;
+                transform: translate(10px, 10px);
+            }
+            75% { 
+                background: #f00;
+                transform: translate(-8px, 5px);
+            }
+            80% { 
+                background: #fff;
+                transform: translate(5px, -10px);
+            }
+            85% { 
+                background: #0ff;
+                transform: translate(-10px, 8px);
+            }
+            90% { 
+                background: #000;
+                transform: translate(8px, -5px);
+            }
+            95% { 
+                background: #ff0;
+                transform: translate(-5px, -8px);
+            }
+            100% { 
+                background: #fff;
+                transform: translate(0, 0);
+            }
         }
 
         #questions {
@@ -122,7 +195,45 @@
 
         .glitch-screen-text {
             font-size: 80px;
-            animation: textGlitch 0.1s infinite;
+            animation: textGlitch 0.05s infinite;
+            position: relative;
+        }
+
+        .glitch-screen-text::before,
+        .glitch-screen-text::after {
+            content: 'ERROR';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-screen-text::before {
+            animation: glitchTextLayer1 0.1s infinite;
+            color: #ff0000;
+            z-index: -1;
+        }
+
+        .glitch-screen-text::after {
+            animation: glitchTextLayer2 0.15s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitchTextLayer1 {
+            0% { transform: translate(-5px, -5px); opacity: 0.8; }
+            25% { transform: translate(10px, 5px); opacity: 0.7; }
+            50% { transform: translate(-8px, 10px); opacity: 0.9; }
+            75% { transform: translate(12px, -8px); opacity: 0.6; }
+            100% { transform: translate(-5px, 8px); opacity: 0.8; }
+        }
+
+        @keyframes glitchTextLayer2 {
+            0% { transform: translate(5px, 5px); opacity: 0.7; }
+            33% { transform: translate(-10px, -5px); opacity: 0.8; }
+            66% { transform: translate(8px, -10px); opacity: 0.6; }
+            100% { transform: translate(5px, 8px); opacity: 0.7; }
         }
     </style>
 </head>
@@ -131,18 +242,6 @@
     <div id="questions"></div>
 
     <script>
-        // Fullscreen automatique
-        document.addEventListener('DOMContentLoaded', () => {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => console.log('Fullscreen:', err));
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.mozRequestFullScreen) {
-                elem.mozRequestFullScreen();
-            }
-        });
-
         // Audio
         let audioContext = null;
 
@@ -272,12 +371,85 @@
             glitchDiv.innerHTML = '<div class="glitch-screen-text">ERROR</div>';
             document.body.appendChild(glitchDiv);
             
+            // Jouer le son de glitch pendant l'écran d'erreur
+            playGlitchSound();
+            
             setTimeout(() => {
                 glitchDiv.remove();
+                stopGlitchSound();
                 currentQuestion = 0;
                 answers = [];
                 displayQuestion(0);
             }, 2000);
+        }
+
+        // Son de glitch pour l'écran d'erreur
+        let glitchSource = null;
+        let glitchGain = null;
+
+        function playGlitchSound() {
+            if (glitchSource) return;
+            
+            try {
+                const ctx = initAudio();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                
+                const bufferSize = ctx.sampleRate * 2.5;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Générer du bruit blanc intense
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                
+                glitchSource = ctx.createBufferSource();
+                glitchSource.buffer = buffer;
+                glitchSource.loop = false;
+                
+                glitchGain = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                
+                filter.type = 'bandpass';
+                filter.frequency.value = 2500 + Math.random() * 1000;
+                filter.Q.value = 0.3;
+                
+                glitchSource.connect(filter);
+                filter.connect(glitchGain);
+                glitchGain.connect(ctx.destination);
+                
+                const now = ctx.currentTime;
+                glitchGain.gain.setValueAtTime(0, now);
+                glitchGain.gain.linearRampToValueAtTime(0.25, now + 0.05);
+                glitchGain.gain.linearRampToValueAtTime(0.2, now + 1);
+                glitchGain.gain.linearRampToValueAtTime(0, now + 2);
+                
+                glitchSource.start(now);
+                
+                glitchSource.onended = () => {
+                    glitchSource = null;
+                    glitchGain = null;
+                };
+            } catch (e) {
+                console.log('Glitch audio:', e.message);
+            }
+        }
+
+        function stopGlitchSound() {
+            if (!glitchSource) return;
+            
+            try {
+                if (glitchSource) {
+                    glitchSource.stop();
+                    glitchSource = null;
+                    glitchGain = null;
+                }
+            } catch (e) {
+                glitchSource = null;
+                glitchGain = null;
+            }
         }
 
         // Démarrer le jeu
