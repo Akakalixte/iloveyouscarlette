@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAPPY BIRTHDAY❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 2s ease;
+        }
+
+        body.destroying {
+            background: #000;
+        }
+
+        /* Particules flottantes */
+        .particle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+            transition: opacity 2s ease, transform 2s ease;
+        }
+
+        .container.destroy {
+            pointer-events: none;
+        }
+        
+        .pixel-destroy {
+            position: fixed;
+            background: #000;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 4em;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                         0 0 40px rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                             0 0 40px rgba(255, 255, 255, 0.3);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+                             0 0 60px rgba(255, 255, 255, 0.5),
+                             0 0 80px rgba(255, 182, 193, 0.5);
+            }
+        }
+
+        .age {
+            font-size: 6em;
+            color: #FFD700;
+            font-weight: bold;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-20px) scale(1.1);
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -50%;
+            }
+            100% {
+                left: 150%;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .message {
+            font-size: 1.4em;
+            line-height: 1.8;
+            color: #333;
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.2em;
+            color: #666;
+            margin: 20px 0;
+        }
+
+        .location::before {
+            content: '📍';
+            font-size: 1.5em;
+        }
+
+        .heart-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .heart {
+            display: inline-block;
+            font-size: 5em;
+            color: #ff1744;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            cursor: pointer;
+            filter: drop-shadow(0 0 20px rgba(255, 23, 68, 0.5));
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.2);
+            }
+            50% {
+                transform: scale(1);
+            }
+            75% {
+                transform: scale(1.1);
+            }
+        }
+
+        .heart:hover {
+            animation: heartbeat 0.5s ease-in-out infinite;
+        }
+
+        .wishes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .wish-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            animation: fadeInUp 1s ease-out;
+            animation-delay: calc(var(--order) * 0.2s);
+            opacity: 0;
+            animation-fill-mode: forwards;
+            transition: all 0.3s ease;
+        }
+
+        .wish-item:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .wish-item::before {
+            content: attr(data-emoji);
+            display: block;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .firework {
+            position: fixed;
+            pointer-events: none;
+            animation: firework 1s ease-out;
+        }
+
+        @keyframes firework {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin: 20px auto;
+            display: block;
+        }
+
+        button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+        }
+
+        button:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            animation: confettiFall 3s linear;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Styles pour la séquence de déconstruction */
+        .typewriter-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 50px;
+            z-index: 1000;
+            background: #000;
+        }
+
+        .typewriter-container.active {
+            display: flex;
+        }
+
+        .typewriter-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.8em;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+                         0 0 20px rgba(255, 255, 255, 0.3);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            opacity: 1;
+            transition: opacity 2s ease;
+        }
+
+        .typewriter-text.fade-out {
+            opacity: 0;
+        }
+
+        .exit-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #000;
+            color: #888;
+            border: 1px solid #222;
+            padding: 20px 50px;
+            font-size: 1.3em;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: normal;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .exit-button.active {
+            display: block;
+        }
+
+        .exit-button:hover {
+            background: #000;
+            color: #888;
+            border: 1px solid #222;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1>🎉 HAPPY BIRTHDAY🎉</h1>
+            <h1 style="color: #FFD700; font-size: 5em; margin: 20px 0;">Scarlette</h1>
+            <div class="age">17</div>
+        </div>
+
+        <div class="card">
+            <div class="location">ITS TODAY MY BABY</div>
+            <div class="message">
+                <p>TODAY IS A GREAT DAY. YOU FINALLY HAVE 17 !🎂</p>
+                <p style="margin-top: 20px;">I'M SO PROUD OF YOU !!!</p>
+            </div>
+            
+            <div class="heart-container">
+                <div class="heart" onclick="createFireworks()">❤️</div>
+            </div>
+
+            <div class="message">
+                <p style="font-size: 1.6em; font-weight: bold; color: #ff1744;">
+                    I LOVE YOU SO MUCH !💕
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="text-align: center; color: #667eea; margin-bottom: 30px; font-size: 2.5em;">
+                MY WISH FOR YOU ! ✨
+            </h2>
+            <div class="wishes">
+                <div class="wish-item" data-emoji="🌟" style="--order: 1">
+                    That you're not tired anymore!!
+                </div>
+                <div class="wish-item" data-emoji="😊" style="--order: 2">
+                    We meet up before you turn 18!
+                </div>
+                <div class="wish-item" data-emoji="🎈" style="--order: 3">
+                    I hope you have a wonderful year!!
+                </div>
+                <div class="wish-item" data-emoji="💖" style="--order: 4">
+                    May you continue to be so awesome!
+                </div>
+                <div class="wish-item" data-emoji="🌈" style="--order: 5">
+                    That we commit a crime together!!!
+                </div>
+                <div class="wish-item" data-emoji="⭐" style="--order: 6">
+                    May you succeed in everything you do!
+                </div>
+            </div>
+        </div>
+
+        <button onclick="startDestruction()">🎊 Click to celebrate! 🎊</button>
+    </div>
+
+    <div class="typewriter-container" id="typewriterContainer">
+        <div class="typewriter-text" id="typewriterText"></div>
+    </div>
+
+    <button class="exit-button" id="exitButton">EXIT</button>
+
+    <script>
+        // Créer des particules flottantes
+        function createParticles() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 5 + 's';
+                    particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 15000);
+                }, i * 200);
+            }
+        }
+
+        // Créer des feux d'artifice
+        function createFireworks() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.textContent = ['✨', '⭐', '💫', '🌟'][Math.floor(Math.random() * 4)];
+                    firework.style.fontSize = '2em';
+                    firework.style.left = '50%';
+                    firework.style.top = '50%';
+                    firework.style.setProperty('--x', (Math.random() - 0.5) * 400 + 'px');
+                    firework.style.setProperty('--y', (Math.random() - 0.5) * 400 + 'px');
+                    document.body.appendChild(firework);
+                    
+                    setTimeout(() => firework.remove(), 1000);
+                }, i * 50);
+            }
+        }
+
+        // Fonction de célébration normale
+        function celebrate() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a29bfe'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+            
+            createFireworks();
+        }
+
+        // Son de frappe de machine à écrire
+        let soundEnabled = true;
+        function playTypeSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'square';
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.05);
+        }
+
+        // Effet de machine à écrire avec hésitations
+        async function typeWriter(text, element) {
+            let i = 0;
+            
+            // Calculer où se trouve "No." dans le texte (après le premier saut de ligne)
+            const noPosition = text.indexOf('\nNo.');
+            
+            while (i < text.length) {
+                element.textContent += text.charAt(i);
+                
+                // Désactiver le son après "No." (après le point qui suit "No")
+                if (i > noPosition && i === text.indexOf('.', noPosition)) {
+                    soundEnabled = false;
+                }
+                
+                playTypeSound();
+                
+                // Délai variable pour simuler des hésitations
+                let delay = 50 + Math.random() * 50;
+                
+                // Hésitations plus longues après certains caractères
+                if (text.charAt(i) === '.' || text.charAt(i) === '?' || text.charAt(i) === '!') {
+                    delay = 400 + Math.random() * 300;
+                } else if (text.charAt(i) === ',') {
+                    delay = 200 + Math.random() * 100;
+                } else if (text.charAt(i) === '\n') {
+                    delay = 600 + Math.random() * 400;
+                } else if (Math.random() > 0.9) {
+                    // Hésitation aléatoire
+                    delay = 200 + Math.random() * 300;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+                i++;
+            }
+        }
+
+        // Créer l'effet de destruction pixel par pixel
+        function pixelDestruction() {
+            return new Promise((resolve) => {
+                const pixelSize = 20;
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const cols = Math.ceil(width / pixelSize);
+                const rows = Math.ceil(height / pixelSize);
+                const totalPixels = cols * rows;
+                
+                // Créer un tableau de tous les pixels
+                let pixels = [];
+                for (let i = 0; i < totalPixels; i++) {
+                    pixels.push(i);
+                }
+                
+                // Mélanger le tableau pour un ordre aléatoire
+                pixels.sort(() => Math.random() - 0.5);
+                
+                // Détruire les pixels progressivement
+                pixels.forEach((pixelIndex, i) => {
+                    setTimeout(() => {
+                        const row = Math.floor(pixelIndex / cols);
+                        const col = pixelIndex % cols;
+                        
+                        const pixel = document.createElement('div');
+                        pixel.className = 'pixel-destroy';
+                        pixel.style.left = col * pixelSize + 'px';
+                        pixel.style.top = row * pixelSize + 'px';
+                        pixel.style.width = pixelSize + 'px';
+                        pixel.style.height = pixelSize + 'px';
+                        document.body.appendChild(pixel);
+                        
+                        // Résoudre la promesse quand le dernier pixel est ajouté
+                        if (i === pixels.length - 1) {
+                            setTimeout(() => resolve(), 100);
+                        }
+                    }, i * 2);
+                });
+            });
+        }
+
+        // Démarrer la séquence de destruction
+        async function startDestruction() {
+            // Célébration initiale
+            celebrate();
+            
+            // Attendre un peu
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Marquer le conteneur comme détruit (pour désactiver les interactions)
+            document.getElementById('mainContainer').classList.add('destroy');
+            
+            // Supprimer toutes les particules
+            document.querySelectorAll('.particle').forEach(p => p.remove());
+            
+            // Démarrer et attendre la destruction pixel par pixel complète
+            await pixelDestruction();
+            
+            // Maintenant changer le fond du body
+            document.body.classList.add('destroying');
+            
+            // Attendre un petit délai pour que le fond noir soit bien visible
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Tenter le plein écran
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
+            } catch (e) {
+                console.log('Fullscreen not available');
+            }
+            
+            // Afficher le conteneur de texte
+            const typewriterContainer = document.getElementById('typewriterContainer');
+            typewriterContainer.classList.add('active');
+            
+            // Texte à afficher
+            const text = `Did you really think I was just going to do that?
+No.
+You're going to have to escape.
+I have faith in you, I know you can do it.`;
+            
+            // Réactiver le son pour le début
+            soundEnabled = true;
+            
+            // Afficher le texte avec effet machine à écrire
+            const typewriterText = document.getElementById('typewriterText');
+            await typeWriter(text, typewriterText);
+            
+            // Attendre un peu
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Faire disparaître le texte
+            typewriterText.classList.add('fade-out');
+            
+            // Attendre que le fade soit terminé
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Masquer le conteneur de texte
+            typewriterContainer.classList.remove('active');
+            
+            // Afficher le bouton EXIT
+            document.getElementById('exitButton').classList.add('active');
+        }
+
+        // Action du bouton EXIT - redirige vers la deuxième page
+        document.getElementById('exitButton').addEventListener('click', function() {
+            // Remplace cette URL par l'URL de ta deuxième page GitHub
+            window.location.href = 'URL_DE_TA_DEUXIEME_PAGE_GITHUB';
+        });
+
+        // Initialiser les particules au chargement
+        createParticles();
+        setInterval(createParticles, 15000);
+
+        // Célébration automatique après 2 secondes
+        setTimeout(celebrate, 2000);
+    </script>
+</body>
+</html>
