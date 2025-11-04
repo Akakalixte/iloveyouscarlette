@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #game-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            text-align: center;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        #game-text.show {
+            opacity: 1;
+            animation: textGlitch 0.3s infinite;
+        }
+
+        @keyframes textGlitch {
+            0% { text-shadow: -2px -2px 0 #ff0000, 2px 2px 0 #00ffff; }
+            25% { text-shadow: 2px -2px 0 #ff0000, -2px 2px 0 #00ffff; }
+            50% { text-shadow: -3px 2px 0 #ff0000, 3px -2px 0 #00ffff; }
+            75% { text-shadow: 2px 3px 0 #ff0000, -2px -3px 0 #00ffff; }
+            100% { text-shadow: -2px -2px 0 #ff0000, 2px 2px 0 #00ffff; }
+        }
+
+        @keyframes glitchScreen {
+            0% { background: #000; }
+            10% { background: #fff; }
+            20% { background: #f00; }
+            30% { background: #0ff; }
+            40% { background: #000; }
+            50% { background: #fff; }
+            60% { background: #ff0; }
+            70% { background: #000; }
+            80% { background: #0f0; }
+            90% { background: #000; }
+            100% { background: #fff; }
+        }
+
+        #questions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        #questions.show {
+            opacity: 1;
+        }
+
+        .question-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .question-text {
+            font-size: 28px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .answer-btn {
+            padding: 15px 50px;
+            font-size: 20px;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .answer-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .glitch-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glitchScreen 0.5s infinite;
+            z-index: 1000;
+        }
+
+        .glitch-screen-text {
+            font-size: 80px;
+            animation: textGlitch 0.1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-text"></div>
+    <div id="questions"></div>
+
+    <script>
+        // Fullscreen automatique
+        document.addEventListener('DOMContentLoaded', () => {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log('Fullscreen:', err));
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            }
+        });
+
+        // Audio
+        let audioContext = null;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        function playTypeSound() {
+            try {
+                const ctx = initAudio();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                oscillator.frequency.value = 700 + Math.random() * 300;
+                oscillator.type = 'square';
+                
+                filter.type = 'lowpass';
+                filter.frequency.value = 2000;
+                filter.Q.value = 1;
+                
+                const now = ctx.currentTime;
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.1);
+            } catch (e) {
+                console.log('Audio:', e.message);
+            }
+        }
+
+        // Texte d'introduction
+        const gameText = document.getElementById('game-text');
+        const questionsDiv = document.getElementById('questions');
+        const introText = `It was pretty obvious, wasn't it?\nLet's play a game.\nTrue or false?`;
+
+        async function showIntro() {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            gameText.classList.add('show');
+            
+            for (let i = 0; i < introText.length; i++) {
+                gameText.textContent = introText.substring(0, i + 1);
+                if (introText[i] !== ' ' && introText[i] !== '\n') {
+                    playTypeSound();
+                }
+                const delay = introText[i] === '\n' ? 400 : 
+                             introText[i] === '.' ? 300 :
+                             introText[i] === ',' ? 200 :
+                             50 + Math.random() * 50;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            gameText.style.opacity = '0';
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            showQuestions();
+        }
+
+        // Questions
+        const questions = [
+            { text: 'You are now 17 years old.', answer: true },
+            { text: 'Your favorite movie is 500 days of summer.', answer: true },
+            { text: 'We started talking on June 6.', answer: false }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+
+        function showQuestions() {
+            displayQuestion(0);
+            questionsDiv.classList.add('show');
+        }
+
+        function displayQuestion(index) {
+            questionsDiv.innerHTML = `
+                <div class="question-container">
+                    <div class="question-text">${questions[index].text}</div>
+                    <div class="buttons-container">
+                        <button class="answer-btn" onclick="handleAnswer(true)">true</button>
+                        <button class="answer-btn" onclick="handleAnswer(false)">false</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAnswer(answer) {
+            answers.push(answer);
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                displayQuestion(currentQuestion);
+            } else {
+                checkAnswers();
+            }
+        }
+
+        function checkAnswers() {
+            const correct = answers[0] === true && answers[1] === true && answers[2] === false;
+            
+            if (correct) {
+                questionsDiv.style.opacity = '0';
+                setTimeout(() => {
+                    questionsDiv.innerHTML = '';
+                    // Suite à venir ici
+                }, 500);
+            } else {
+                showGlitchScreen();
+            }
+        }
+
+        function showGlitchScreen() {
+            const glitchDiv = document.createElement('div');
+            glitchDiv.className = 'glitch-screen';
+            glitchDiv.innerHTML = '<div class="glitch-screen-text">ERROR</div>';
+            document.body.appendChild(glitchDiv);
+            
+            setTimeout(() => {
+                glitchDiv.remove();
+                currentQuestion = 0;
+                answers = [];
+                displayQuestion(0);
+            }, 2000);
+        }
+
+        // Démarrer le jeu
+        showIntro();
+    </script>
+</body>
+</html>
