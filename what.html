@@ -17,6 +17,7 @@
             color: #fff;
             overflow: hidden;
             cursor: default;
+            min-height: 100vh;
         }
 
         #text-container {
@@ -37,9 +38,8 @@
         #text-container.fade-out {
             opacity: 0;
         }
-        
-        /* Style du bouton de redirection simple */
-        #simple-redirect-button {
+
+        #exit-button {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -51,28 +51,160 @@
             color: #fff;
             border: 2px solid #fff;
             cursor: pointer;
-            transition: background 0.3s, color 0.3s;
-            display: none; /* Commence caché */
+            opacity: 0;
+            transition: opacity 1s;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            display: none;
         }
 
-        #simple-redirect-button:hover {
-            background: #fff;
-            color: #000;
+        #exit-button.show {
+            opacity: 1;
+        }
+
+        #exit-button:hover {
+            box-shadow: 
+                0 0 20px rgba(255, 0, 0, 0.5),
+                0 0 40px rgba(0, 255, 255, 0.5),
+                0 0 60px rgba(255, 255, 0, 0.3);
+            animation: glitchButton 0.1s infinite, glitchText 0.15s infinite;
+        }
+
+        #exit-button:hover::before,
+        #exit-button:hover::after {
+            content: 'exit';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 60px;
+        }
+
+        #exit-button:hover::before {
+            animation: glitchRed 0.2s infinite;
+            color: #ff0000;
+            z-index: -1;
+        }
+
+        #exit-button:hover::after {
+            animation: glitchBlue 0.3s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitchButton {
+            0% {
+                transform: translate(-50%, -50%);
+                filter: hue-rotate(0deg);
+            }
+            20% {
+                transform: translate(calc(-50% - 5px), calc(-50% + 5px));
+                filter: hue-rotate(90deg);
+            }
+            40% {
+                transform: translate(calc(-50% + 3px), calc(-50% - 3px));
+                filter: hue-rotate(180deg);
+            }
+            60% {
+                transform: translate(calc(-50% - 2px), calc(-50% - 4px));
+                filter: hue-rotate(270deg);
+            }
+            80% {
+                transform: translate(calc(-50% + 4px), calc(-50% + 2px));
+                filter: hue-rotate(45deg);
+            }
+            100% {
+                transform: translate(-50%, -50%);
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        @keyframes glitchRed {
+            0% {
+                transform: translate(-3px, -3px);
+                opacity: 0.8;
+            }
+            25% {
+                transform: translate(5px, 2px);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translate(-2px, 4px);
+                opacity: 0.9;
+            }
+            75% {
+                transform: translate(4px, -2px);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-3px, 3px);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes glitchBlue {
+            0% {
+                transform: translate(3px, 3px);
+                opacity: 0.7;
+            }
+            33% {
+                transform: translate(-4px, -2px);
+                opacity: 0.8;
+            }
+            66% {
+                transform: translate(2px, -4px);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(3px, 2px);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes glitchText {
+            0% {
+                text-shadow: 
+                    -2px -2px 0 #ff0000,
+                    2px 2px 0 #00ffff,
+                    0 0 10px #ffff00;
+            }
+            25% {
+                text-shadow: 
+                    2px -2px 0 #ff0000,
+                    -2px 2px 0 #00ffff,
+                    3px 0 15px #ffff00;
+            }
+            50% {
+                text-shadow: 
+                    -3px 2px 0 #ff0000,
+                    3px -2px 0 #00ffff,
+                    -2px 0 20px #ffff00;
+            }
+            75% {
+                text-shadow: 
+                    2px 3px 0 #ff0000,
+                    -2px -3px 0 #00ffff,
+                    0 3px 15px #ffff00;
+            }
+            100% {
+                text-shadow: 
+                    -2px -2px 0 #ff0000,
+                    2px 2px 0 #00ffff,
+                    0 0 10px #ffff00;
+            }
         }
     </style>
 </head>
 <body>
     <div id="text-container"></div>
-    <button id="simple-redirect-button">Commencer le jeu</button>
+    <button id="exit-button">exit</button>
 
     <script>
-        // VARIABLES GLOBALES
         const textContainer = document.getElementById('text-container');
-        // Référence au nouveau bouton
-        const redirectButton = document.getElementById('simple-redirect-button');
-        
-        let audioContext = null;
-        let audioUnlocked = false;
+        const exitButton = document.getElementById('exit-button');
 
         // Texte à afficher
         const text = `Did you really think I was just going to do that?
@@ -80,7 +212,9 @@ No.
 You're going to have to escape.
 I have faith in you, I know you can do it.`;
 
-        // --- GESTION AUDIO API ---
+        // Audio context
+        let audioContext = null;
+
         function initAudio() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -88,11 +222,12 @@ I have faith in you, I know you can do it.`;
             return audioContext;
         }
 
-        // Son de machine à écrire
         function playTypeSound() {
             try {
                 const ctx = initAudio();
-                if (ctx.state === 'suspended') { ctx.resume(); }
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
                 
                 const oscillator = ctx.createOscillator();
                 const gainNode = ctx.createGain();
@@ -102,11 +237,12 @@ I have faith in you, I know you can do it.`;
                 filter.connect(gainNode);
                 gainNode.connect(ctx.destination);
                 
-                // Paramètres du son
                 oscillator.frequency.value = 700 + Math.random() * 300;
                 oscillator.type = 'square';
+                
                 filter.type = 'lowpass';
                 filter.frequency.value = 2000;
+                filter.Q.value = 1;
                 
                 const now = ctx.currentTime;
                 gainNode.gain.setValueAtTime(0.2, now);
@@ -115,33 +251,11 @@ I have faith in you, I know you can do it.`;
                 oscillator.start(now);
                 oscillator.stop(now + 0.1);
             } catch (e) {
-                console.log('Audio Type Sound Error:', e.message);
-            }
-        }
-        
-        // Déverrouillage audio
-        async function unlockAudioAndFullscreen() {
-            if (!audioUnlocked) {
-                audioUnlocked = true;
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                // Débloquer le contexte audio
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                gain.gain.value = 0;
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(0);
-                osc.stop(0.001);
-                await ctx.resume();
+                console.log('Audio:', e.message);
             }
         }
 
-        // Attendre le premier clic/touche pour débloquer l'audio
-        document.addEventListener('click', unlockAudioAndFullscreen, { once: true });
-        document.addEventListener('keydown', unlockAudioAndFullscreen, { once: true });
-
-
-        // Animation de la machine à écrire
+        // Animation machine à écrire
         async function typeWriter() {
             textContainer.classList.add('show');
             
@@ -153,9 +267,9 @@ I have faith in you, I know you can do it.`;
                 }
                 
                 const delay = text[i] === '\n' ? 400 : 
-                                 text[i] === '.' ? 300 :
-                                 text[i] === ',' ? 200 :
-                                 50 + Math.random() * 50;
+                             text[i] === '.' ? 300 :
+                             text[i] === ',' ? 200 :
+                             50 + Math.random() * 50;
                 
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
@@ -163,22 +277,113 @@ I have faith in you, I know you can do it.`;
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             textContainer.classList.add('fade-out');
-            
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             textContainer.style.display = 'none';
-            // REND VISIBLE LE NOUVEAU BOUTON SIMPLE
-            redirectButton.style.display = 'block'; 
+            exitButton.style.display = 'block';
+            setTimeout(() => {
+                exitButton.classList.add('show');
+            }, 50);
         }
 
-        // Action du bouton simple : REDIRECTION DIRECTE
-        redirectButton.addEventListener('click', () => {
-            // C'est cette ligne qui fait la redirection vers le fichier dans le même répertoire
-            **window.location.href = 'game.html';**
+        // Son de glitch continu
+        let glitchSource = null;
+        let glitchGain = null;
+
+        function startGlitchSound() {
+            if (glitchSource) return;
+            
+            try {
+                const ctx = initAudio();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                
+                const bufferSize = ctx.sampleRate * 2;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                
+                glitchSource = ctx.createBufferSource();
+                glitchSource.buffer = buffer;
+                glitchSource.loop = true;
+                
+                glitchGain = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                
+                filter.type = 'bandpass';
+                filter.frequency.value = 3000;
+                filter.Q.value = 0.5;
+                
+                glitchSource.connect(filter);
+                filter.connect(glitchGain);
+                glitchGain.connect(ctx.destination);
+                
+                const now = ctx.currentTime;
+                glitchGain.gain.setValueAtTime(0, now);
+                glitchGain.gain.linearRampToValueAtTime(0.15, now + 0.05);
+                
+                glitchSource.start(now);
+            } catch (e) {
+                console.log('Glitch audio:', e.message);
+            }
+        }
+
+        function stopGlitchSound() {
+            if (!glitchSource || !glitchGain) return;
+            
+            try {
+                const ctx = initAudio();
+                const now = ctx.currentTime;
+                
+                glitchGain.gain.cancelScheduledValues(now);
+                glitchGain.gain.setValueAtTime(glitchGain.gain.value, now);
+                glitchGain.gain.linearRampToValueAtTime(0, now + 0.1);
+                
+                setTimeout(() => {
+                    if (glitchSource) {
+                        glitchSource.stop();
+                        glitchSource = null;
+                        glitchGain = null;
+                    }
+                }, 150);
+            } catch (e) {
+                glitchSource = null;
+                glitchGain = null;
+            }
+        }
+
+        // Events du bouton
+        exitButton.addEventListener('mouseenter', startGlitchSound);
+        exitButton.addEventListener('mouseleave', stopGlitchSound);
+
+        exitButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Button clicked - redirecting to game.html');
+            stopGlitchSound();
+            
+            // Flash blanc
+            document.body.style.transition = 'background 0.1s';
+            document.body.style.background = '#fff';
+            
+            setTimeout(() => {
+                document.body.style.background = '#000';
+                setTimeout(() => {
+                    window.location.href = 'game.html';
+                }, 100);
+            }, 100);
         });
-        
-        // Lancer l'animation après un court délai
-        setTimeout(typeWriter, 500);
+
+        // Démarrer l'animation
+        setTimeout(() => {
+            initAudio();
+            typeWriter();
+        }, 500);
     </script>
 </body>
 </html>
