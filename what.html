@@ -1,597 +1,184 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escape</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        body {
-            background: #000;
-            font-family: 'Courier New', monospace;
-            color: #fff;
-            overflow: hidden;
-            cursor: default;
-        }
+        body {
+            background: #000;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            overflow: hidden;
+            cursor: default;
+        }
 
-        #text-container {
-            position: absolute;
-            top: 50px;
-            left: 50px;
-            font-size: 28px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            opacity: 0;
-            transition: opacity 1s;
-        }
+        #text-container {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            font-size: 28px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            opacity: 0;
+            transition: opacity 1s;
+        }
 
-        #text-container.show {
-            opacity: 1;
-        }
+        #text-container.show {
+            opacity: 1;
+        }
 
-        #text-container.fade-out {
-            opacity: 0;
-        }
+        #text-container.fade-out {
+            opacity: 0;
+        }
+        
+        /* Style du bouton de redirection simple */
+        #simple-redirect-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 60px;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            display: none; /* Commence caché */
+        }
 
-        #exit-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px 60px;
-            font-size: 24px;
-            font-family: 'Courier New', monospace;
-            background: #000;
-            color: #fff;
-            border: 2px solid #fff;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 1s;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-        }
-
-        #exit-button.show {
-            opacity: 1;
-        }
-
-        #exit-button:hover {
-            animation: glitchButton 0.1s infinite, glitchText 0.15s infinite;
-            box-shadow: 
-                0 0 20px rgba(255, 0, 0, 0.5),
-                0 0 40px rgba(0, 255, 255, 0.5),
-                0 0 60px rgba(255, 255, 0, 0.3);
-        }
-
-        #exit-button:hover::before,
-        #exit-button:hover::after {
-            content: 'exit';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 60px;
-        }
-
-        #exit-button:hover::before {
-            animation: glitchRed 0.2s infinite;
-            color: #ff0000;
-            z-index: -1;
-        }
-
-        #exit-button:hover::after {
-            animation: glitchBlue 0.3s infinite;
-            color: #00ffff;
-            z-index: -2;
-        }
-
-        @keyframes glitchButton {
-            0% {
-                transform: translate(-50%, -50%);
-                filter: hue-rotate(0deg);
-            }
-            20% {
-                transform: translate(calc(-50% - 5px), calc(-50% + 5px));
-                filter: hue-rotate(90deg);
-            }
-            40% {
-                transform: translate(calc(-50% + 3px), calc(-50% - 3px));
-                filter: hue-rotate(180deg);
-            }
-            60% {
-                transform: translate(calc(-50% - 2px), calc(-50% - 4px));
-                filter: hue-rotate(270deg);
-            }
-            80% {
-                transform: translate(calc(-50% + 4px), calc(-50% + 2px));
-                filter: hue-rotate(45deg);
-            }
-            100% {
-                transform: translate(-50%, -50%);
-                filter: hue-rotate(360deg);
-            }
-        }
-
-        @keyframes glitchRed {
-            0% {
-                transform: translate(-3px, -3px);
-                opacity: 0.8;
-            }
-            25% {
-                transform: translate(5px, 2px);
-                opacity: 0.7;
-            }
-            50% {
-                transform: translate(-2px, 4px);
-                opacity: 0.9;
-            }
-            75% {
-                transform: translate(4px, -2px);
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(-3px, 3px);
-                opacity: 0.8;
-            }
-        }
-
-        @keyframes glitchBlue {
-            0% {
-                transform: translate(3px, 3px);
-                opacity: 0.7;
-            }
-            33% {
-                transform: translate(-4px, -2px);
-                opacity: 0.8;
-            }
-            66% {
-                transform: translate(2px, -4px);
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(3px, 2px);
-                opacity: 0.7;
-            }
-        }
-    </style>
-    </head>
+        #simple-redirect-button:hover {
+            background: #fff;
+            color: #000;
+        }
+    </style>
+</head>
 <body>
-    <div id="text-container"></div>
-    <button id="exit-button" style="display: none;">exit</button>
+    <div id="text-container"></div>
+    <button id="simple-redirect-button">Commencer le jeu</button>
 
-    <script>
-        // VARIABLES GLOBALES
-        const textContainer = document.getElementById('text-container');
-        const exitButton = document.getElementById('exit-button');
-        
-        let audioContext = null;
-        let glitchSource = null;
-        let glitchGain = null;
-        let fullscreenAttempted = false;
-        let audioUnlocked = false;
+    <script>
+        // VARIABLES GLOBALES
+        const textContainer = document.getElementById('text-container');
+        // Référence au nouveau bouton
+        const redirectButton = document.getElementById('simple-redirect-button');
+        
+        let audioContext = null;
+        let audioUnlocked = false;
 
-        // Texte à afficher
-        const text = `Did you really think I was just going to do that?
+        // Texte à afficher
+        const text = `Did you really think I was just going to do that?
 No.
 You're going to have to escape.
 I have faith in you, I know you can do it.`;
 
-        // --- GESTION AUDIO API ---
-        function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            return audioContext;
-        }
+        // --- GESTION AUDIO API ---
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
 
-        // Son de machine à écrire
-        function playTypeSound() {
-            try {
-                const ctx = initAudio();
-                if (ctx.state === 'suspended') { ctx.resume(); }
-                
-                const oscillator = ctx.createOscillator();
-                const gainNode = ctx.createGain();
-                const filter = ctx.createBiquadFilter();
-                
-                oscillator.connect(filter);
-                filter.connect(gainNode);
-                gainNode.connect(ctx.destination);
-                
-                // Paramètres du son
-                oscillator.frequency.value = 700 + Math.random() * 300;
-                oscillator.type = 'square';
-                filter.type = 'lowpass';
-                filter.frequency.value = 2000;
-                
-                const now = ctx.currentTime;
-                gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                
-                oscillator.start(now);
-                oscillator.stop(now + 0.1);
-            } catch (e) {
-                console.log('Audio Type Sound Error:', e.message);
-            }
-        }
+        // Son de machine à écrire
+        function playTypeSound() {
+            try {
+                const ctx = initAudio();
+                if (ctx.state === 'suspended') { ctx.resume(); }
+                
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                // Paramètres du son
+                oscillator.frequency.value = 700 + Math.random() * 300;
+                oscillator.type = 'square';
+                filter.type = 'lowpass';
+                filter.frequency.value = 2000;
+                
+                const now = ctx.currentTime;
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.1);
+            } catch (e) {
+                console.log('Audio Type Sound Error:', e.message);
+            }
+        }
+        
+        // Déverrouillage audio
+        async function unlockAudioAndFullscreen() {
+            if (!audioUnlocked) {
+                audioUnlocked = true;
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                // Débloquer le contexte audio
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                gain.gain.value = 0;
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(0);
+                osc.stop(0.001);
+                await ctx.resume();
+            }
+        }
 
-        // Son de glitch au hover (Déplacé du <style> au <script>)
-        function startGlitchSound() {
-            if (glitchSource) return;
-            
-            try {
-                const ctx = initAudio();
-                if (ctx.state === 'suspended') { ctx.resume(); }
-                
-                // Créer un bruit blanc continu (static TV)
-                const bufferSize = ctx.sampleRate * 2;
-                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                
-                glitchSource = ctx.createBufferSource();
-                glitchSource.buffer = buffer;
-                glitchSource.loop = true;
-                
-                glitchGain = ctx.createGain();
-                const filter = ctx.createBiquadFilter();
-                
-                filter.type = 'bandpass';
-                filter.frequency.value = 3000;
-                filter.Q.value = 0.5;
-                
-                glitchSource.connect(filter);
-                filter.connect(glitchGain);
-                glitchGain.connect(ctx.destination);
-                
-                const now = ctx.currentTime;
-                glitchGain.gain.setValueAtTime(0, now);
-                glitchGain.gain.linearRampToValueAtTime(0.15, now + 0.05);
-                
-                glitchSource.start(now);
-            } catch (e) {
-                console.log('Glitch audio start error:', e.message);
-            }
-        }
-
-        function stopGlitchSound() {
-            if (!glitchSource || !glitchGain) return;
-            
-            try {
-                const ctx = initAudio();
-                const now = ctx.currentTime;
-                
-                // Fade out
-                glitchGain.gain.cancelScheduledValues(now);
-                glitchGain.gain.setValueAtTime(glitchGain.gain.value, now);
-                glitchGain.gain.linearRampToValueAtTime(0, now + 0.1);
-                
-                setTimeout(() => {
-                    if (glitchSource) {
-                        glitchSource.stop();
-                        glitchSource = null;
-                        glitchGain = null;
-                    }
-                }, 150);
-            } catch (e) {
-                glitchSource = null;
-                glitchGain = null;
-                console.log('Glitch audio stop error:', e.message);
-            }
-        }
-        
-        // Déclenchement de l'audio du bouton (CORRIGÉ : placé après la définition de exitButton)
-        exitButton.addEventListener('mouseenter', startGlitchSound);
-        exitButton.addEventListener('mouseleave', stopGlitchSound);
+        // Attendre le premier clic/touche pour débloquer l'audio
+        document.addEventListener('click', unlockAudioAndFullscreen, { once: true });
+        document.addEventListener('keydown', unlockAudioAndFullscreen, { once: true });
 
 
-        // Déverrouillage audio et plein écran (nécessite une interaction utilisateur)
-        async function unlockAudioAndFullscreen() {
-            if (!audioUnlocked) {
-                audioUnlocked = true;
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                // Débloquer le contexte audio en jouant un son silencieux
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                gain.gain.value = 0;
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(0);
-                osc.stop(0.001);
-                await ctx.resume();
-            }
-            
-            if (!fullscreenAttempted) {
-                fullscreenAttempted = true;
-                const elem = document.documentElement;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen().catch(err => {
-                        console.log('Fullscreen nécessite une interaction utilisateur');
-                    });
-                }
-            }
-        }
+        // Animation de la machine à écrire
+        async function typeWriter() {
+            textContainer.classList.add('show');
+            
+            for (let i = 0; i < text.length; i++) {
+                textContainer.textContent = text.substring(0, i + 1);
+                
+                if (text[i] !== ' ' && text[i] !== '\n') {
+                    playTypeSound();
+                }
+                
+                const delay = text[i] === '\n' ? 400 : 
+                                 text[i] === '.' ? 300 :
+                                 text[i] === ',' ? 200 :
+                                 50 + Math.random() * 50;
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            textContainer.classList.add('fade-out');
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            textContainer.style.display = 'none';
+            // REND VISIBLE LE NOUVEAU BOUTON SIMPLE
+            redirectButton.style.display = 'block'; 
+        }
 
-        // Attendre le premier clic/touche pour débloquer tout
-        document.addEventListener('click', unlockAudioAndFullscreen, { once: true });
-        document.addEventListener('keydown', unlockAudioAndFullscreen, { once: true });
-
-
-        // Animation de la machine à écrire
-        async function typeWriter() {
-            textContainer.classList.add('show');
-            
-            for (let i = 0; i < text.length; i++) {
-                textContainer.textContent = text.substring(0, i + 1);
-                
-                if (text[i] !== ' ' && text[i] !== '\n') {
-                    playTypeSound();
-                }
-                
-                const delay = text[i] === '\n' ? 400 : 
-                             text[i] === '.' ? 300 :
-                             text[i] === ',' ? 200 :
-                             50 + Math.random() * 50;
-                
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-            
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            textContainer.classList.add('fade-out');
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            textContainer.style.display = 'none';
-            exitButton.style.display = 'block';
-            setTimeout(() => {
-                exitButton.classList.add('show');
-            }, 50);
-        }
-
-        // Action du bouton exit - Lancement de la séquence de jeu
-        exitButton.addEventListener('click', () => {
-            stopGlitchSound();
-            startGameSequence();
-        });
-
-        // Séquence du jeu (Déplacement vers la page game.html en cas de succès)
-        async function startGameSequence() {
-            // Flash blanc
-            document.body.style.background = '#fff';
-            await new Promise(resolve => setTimeout(resolve, 100));
-            document.body.style.background = '#000';
-            
-            // Cacher le bouton
-            exitButton.style.display = 'none';
-            
-            // Ajouter l'animation de glitch pour le texte et l'écran (maintenu ici)
-            const style = document.createElement('style');
-            style.id = 'game-styles';
-            style.textContent = `
-                @keyframes textGlitch {
-                    0% { text-shadow: -2px -2px 0 #ff0000, 2px 2px 0 #00ffff; }
-                    25% { text-shadow: 2px -2px 0 #ff0000, -2px 2px 0 #00ffff; }
-                    50% { text-shadow: -3px 2px 0 #ff0000, 3px -2px 0 #00ffff; }
-                    75% { text-shadow: 2px 3px 0 #ff0000, -2px -3px 0 #00ffff; }
-                    100% { text-shadow: -2px -2px 0 #ff0000, 2px 2px 0 #00ffff; }
-                }
-                @keyframes glitchScreen {
-                    0% { background: #000; }
-                    10% { background: #fff; }
-                    20% { background: #f00; }
-                    30% { background: #0ff; }
-                    40% { background: #000; }
-                    50% { background: #fff; }
-                    60% { background: #ff0; }
-                    70% { background: #000; }
-                    80% { background: #0f0; }
-                    90% { background: #000; }
-                    100% { background: #fff; }
-                }
-            `;
-            document.head.appendChild(style);
-
-
-            const gameText = document.createElement('div');
-            gameText.id = 'game-text';
-            gameText.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 32px;
-                text-align: center;
-                line-height: 1.8;
-                opacity: 0;
-                transition: opacity 0.5s;
-                animation: textGlitch 0.3s infinite;
-            `;
-            document.body.appendChild(gameText);
-            
-            const introText = `It was pretty obvious, wasn't it?\nLet's play a game.\nTrue or false?`;
-            
-            await new Promise(resolve => setTimeout(resolve, 300));
-            gameText.style.opacity = '1';
-            
-            // Effet machine à écrire pour le texte du jeu
-            for (let i = 0; i < introText.length; i++) {
-                gameText.textContent = introText.substring(0, i + 1);
-                if (introText[i] !== ' ' && introText[i] !== '\n') {
-                    playTypeSound();
-                }
-                const delay = introText[i] === '\n' ? 400 : 
-                             introText[i] === '.' ? 300 :
-                             introText[i] === ',' ? 200 :
-                             50 + Math.random() * 50;
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-            
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Faire disparaître et afficher les questions
-            gameText.style.opacity = '0';
-            await new Promise(resolve => setTimeout(resolve, 500));
-            gameText.remove();
-            
-            showQuestions();
-        }
-
-        // Afficher les questions
-        function showQuestions() {
-            const questionsContainer = document.createElement('div');
-            questionsContainer.id = 'questions';
-            questionsContainer.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 80%;
-                max-width: 600px;
-            `;
-            
-            const questions = [
-                { text: 'You are now 17 years old.', answer: true },
-                { text: 'Your favorite movie is 500 days of summer.', answer: true },
-                { text: 'We started talking on June 6.', answer: false }
-            ];
-            
-            let currentQuestion = 0;
-            const answers = [];
-            
-            function displayQuestion(index) {
-                questionsContainer.innerHTML = '';
-                
-                const questionDiv = document.createElement('div');
-                questionDiv.style.cssText = `
-                    text-align: center;
-                    margin-bottom: 40px;
-                `;
-                
-                const questionText = document.createElement('div');
-                questionText.textContent = questions[index].text;
-                questionText.style.cssText = `
-                    font-size: 28px;
-                    margin-bottom: 30px;
-                    line-height: 1.6;
-                `;
-                
-                const buttonsDiv = document.createElement('div');
-                buttonsDiv.style.cssText = `
-                    display: flex;
-                    gap: 30px;
-                    justify-content: center;
-                `;
-                
-                const trueBtn = document.createElement('button');
-                trueBtn.textContent = 'true';
-                trueBtn.style.cssText = `
-                    padding: 15px 50px;
-                    font-size: 20px;
-                    font-family: 'Courier New', monospace;
-                    background: #000;
-                    color: #fff;
-                    border: 2px solid #fff;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                `;
-                
-                const falseBtn = document.createElement('button');
-                falseBtn.textContent = 'false';
-                falseBtn.style.cssText = trueBtn.style.cssText;
-                
-                trueBtn.onmouseenter = falseBtn.onmouseenter = function() {
-                    this.style.background = '#fff';
-                    this.style.color = '#000';
-                };
-                trueBtn.onmouseleave = falseBtn.onmouseleave = function() {
-                    this.style.background = '#000';
-                    this.style.color = '#fff';
-                };
-                
-                trueBtn.onclick = () => handleAnswer(true);
-                falseBtn.onclick = () => handleAnswer(false);
-                
-                buttonsDiv.appendChild(trueBtn);
-                buttonsDiv.appendChild(falseBtn);
-                questionDiv.appendChild(questionText);
-                questionDiv.appendChild(buttonsDiv);
-                questionsContainer.appendChild(questionDiv);
-            }
-            
-            function handleAnswer(answer) {
-                answers.push(answer);
-                currentQuestion++;
-                
-                if (currentQuestion < questions.length) {
-                    displayQuestion(currentQuestion);
-                } else {
-                    checkAnswers();
-                }
-            }
-            
-            // Ajout de la redirection vers game.html en cas de succès (CORRECTION)
-            function checkAnswers() {
-                const correct = answers[0] === true && answers[1] === true && answers[2] === false;
-                
-                if (correct) {
-                    questionsContainer.style.opacity = '0';
-                    setTimeout(() => {
-                        questionsContainer.remove();
-                        // Redirection vers game.html
-                        **window.location.href = 'game.html';**                     }, 500);
-                } else {
-                    showGlitchScreen();
-                }
-            }
-            
-            function showGlitchScreen() {
-                questionsContainer.innerHTML = '';
-                questionsContainer.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: #000;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    animation: glitchScreen 0.5s infinite;
-                `;
-                
-                const glitchText = document.createElement('div');
-                glitchText.textContent = 'ERROR';
-                glitchText.style.cssText = `
-                    font-size: 80px;
-                    animation: textGlitch 0.1s infinite;
-                `;
-                questionsContainer.appendChild(glitchText);
-                
-                setTimeout(() => {
-                    questionsContainer.remove();
-                    currentQuestion = 0;
-                    answers.length = 0;
-                    showQuestions(); // Recommence la séquence de questions
-                }, 2000);
-            }
-            
-            document.body.appendChild(questionsContainer);
-            displayQuestion(0);
-        }
-        
-        // Lancer l'animation après un court délai
-        setTimeout(typeWriter, 500);
-    </script>
+        // Action du bouton simple : REDIRECTION DIRECTE
+        redirectButton.addEventListener('click', () => {
+            // C'est cette ligne qui fait la redirection vers le fichier dans le même répertoire
+            **window.location.href = 'game.html';**
+        });
+        
+        // Lancer l'animation après un court délai
+        setTimeout(typeWriter, 500);
+    </script>
 </body>
 </html>
