@@ -166,6 +166,83 @@
             animation: glitchButton 0.1s infinite, glitchText 0.15s infinite;
         }
 
+        /* Son de glitch au hover - continue tant que le curseur est dessus */
+        let glitchSource = null;
+        let glitchGain = null;
+
+        function startGlitchSound() {
+            if (glitchSource) return; // Déjà en cours
+            
+            try {
+                const ctx = initAudio();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                
+                // Créer un bruit blanc continu (static TV)
+                const bufferSize = ctx.sampleRate * 2; // 2 secondes de buffer
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Générer du bruit blanc
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                
+                glitchSource = ctx.createBufferSource();
+                glitchSource.buffer = buffer;
+                glitchSource.loop = true; // Boucle infinie
+                
+                glitchGain = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                
+                // Filtre pour rendre le son plus "TV statique"
+                filter.type = 'bandpass';
+                filter.frequency.value = 3000;
+                filter.Q.value = 0.5;
+                
+                glitchSource.connect(filter);
+                filter.connect(glitchGain);
+                glitchGain.connect(ctx.destination);
+                
+                const now = ctx.currentTime;
+                glitchGain.gain.setValueAtTime(0, now);
+                glitchGain.gain.linearRampToValueAtTime(0.15, now + 0.05);
+                
+                glitchSource.start(now);
+            } catch (e) {
+                console.log('Glitch audio:', e.message);
+            }
+        }
+
+        function stopGlitchSound() {
+            if (!glitchSource || !glitchGain) return;
+            
+            try {
+                const ctx = initAudio();
+                const now = ctx.currentTime;
+                
+                // Fade out
+                glitchGain.gain.cancelScheduledValues(now);
+                glitchGain.gain.setValueAtTime(glitchGain.gain.value, now);
+                glitchGain.gain.linearRampToValueAtTime(0, now + 0.1);
+                
+                setTimeout(() => {
+                    if (glitchSource) {
+                        glitchSource.stop();
+                        glitchSource = null;
+                        glitchGain = null;
+                    }
+                }, 150);
+            } catch (e) {
+                glitchSource = null;
+                glitchGain = null;
+            }
+        }
+
+        exitButton.addEventListener('mouseenter', startGlitchSound);
+        exitButton.addEventListener('mouseleave', stopGlitchSound);
+
         @keyframes glitchText {
             0% {
                 text-shadow: 
@@ -204,15 +281,26 @@
     <div id="text-container"></div>
     <button id="exit-button" style="display: none;">exit</button>
 
-    <audio id="typeSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
-    </audio>
-
     <script>
-        // Fullscreen au chargement avec gestion du clic utilisateur
+        // Fullscreen au chargement - l'utilisateur doit cliquer pour activer
         let fullscreenAttempted = false;
+        let audioUnlocked = false;
         
-        function tryFullscreen() {
+        async function unlockAudioAndFullscreen() {
+            if (!audioUnlocked) {
+                audioUnlocked = true;
+                // Créer et jouer un son silencieux pour débloquer l'audio
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                gain.gain.value = 0;
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(0);
+                osc.stop(0.001);
+                await ctx.resume();
+            }
+            
             if (!fullscreenAttempted) {
                 fullscreenAttempted = true;
                 const elem = document.documentElement;
@@ -224,8 +312,9 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', tryFullscreen);
-        document.addEventListener('click', tryFullscreen, { once: true });
+        // Attendre le premier clic/touche pour débloquer tout
+        document.addEventListener('click', unlockAudioAndFullscreen, { once: true });
+        document.addEventListener('keydown', unlockAudioAndFullscreen, { once: true });
 
         // Texte à afficher
         const text = `Did you really think I was just going to do that?
@@ -236,60 +325,63 @@ I have faith in you, I know you can do it.`;
         const textContainer = document.getElementById('text-container');
         const exitButton = document.getElementById('exit-button');
 
-        // Système audio amélioré
-        let audioContext;
-        let audioInitialized = false;
+        // Système audio avec Web Audio API
+        let audioContext = null;
 
         function initAudio() {
-            if (!audioInitialized) {
+            if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                audioInitialized = true;
             }
+            return audioContext;
         }
 
         // Fonction pour jouer un son de touche de machine à écrire
         function playTypeSound() {
-            initAudio();
-            
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            const filter = audioContext.createBiquadFilter();
-            
-            oscillator.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Son plus réaliste de machine à écrire
-            oscillator.frequency.value = 600 + Math.random() * 400;
-            oscillator.type = 'square';
-            
-            filter.type = 'lowpass';
-            filter.frequency.value = 2000;
-            
-            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.08);
+            try {
+                const ctx = initAudio();
+                
+                // Reprendre le contexte si suspendu
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                // Son de machine à écrire mécanique
+                oscillator.frequency.value = 700 + Math.random() * 300;
+                oscillator.type = 'square';
+                
+                filter.type = 'lowpass';
+                filter.frequency.value = 2000;
+                filter.Q.value = 1;
+                
+                const now = ctx.currentTime;
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.1);
+            } catch (e) {
+                console.log('Audio:', e.message);
+            }
         }
 
         // Animation de la machine à écrire
         async function typeWriter() {
-            // Initialiser l'audio au premier caractère
-            initAudio();
-            
             textContainer.classList.add('show');
             
             for (let i = 0; i < text.length; i++) {
                 textContainer.textContent = text.substring(0, i + 1);
                 
-                // Jouer le son seulement pour les caractères visibles (pas les espaces)
+                // Jouer le son pour chaque caractère visible
                 if (text[i] !== ' ' && text[i] !== '\n') {
-                    try {
-                        playTypeSound();
-                    } catch (e) {
-                        console.log('Audio error:', e);
-                    }
+                    playTypeSound();
                 }
                 
                 // Vitesse variable pour plus de réalisme
