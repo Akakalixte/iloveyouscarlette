@@ -627,49 +627,11 @@
             // Maintenant changer le fond du body
             document.body.classList.add('destroying');
             
-            // Attendre un petit délai pour que le fond noir soit bien visible
+            // Attendre un petit délai
             await new Promise(resolve => setTimeout(resolve, 500));
             
-            // Tenter le plein écran
-            try {
-                if (document.documentElement.requestFullscreen) {
-                    await document.documentElement.requestFullscreen();
-                }
-            } catch (e) {
-                console.log('Fullscreen not available');
-            }
-            
-            // Afficher le conteneur de texte
-            const typewriterContainer = document.getElementById('typewriterContainer');
-            typewriterContainer.classList.add('active');
-            
-            // Texte à afficher
-            const text = `Did you really think I was just going to do that?
-No.
-You're going to have to escape.
-I have faith in you, I know you can do it.`;
-            
-            // Réactiver le son pour le début
-            soundEnabled = true;
-            
-            // Afficher le texte avec effet machine à écrire
-            const typewriterText = document.getElementById('typewriterText');
-            await typeWriter(text, typewriterText);
-            
-            // Attendre un peu
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Faire disparaître le texte
-            typewriterText.classList.add('fade-out');
-            
-            // Attendre que le fade soit terminé
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Masquer le conteneur de texte
-            typewriterContainer.classList.remove('active');
-            
-            // Afficher le bouton EXIT
-            document.getElementById('exitButton').classList.add('active');
+            // Rediriger vers what.html
+            window.location.href = 'what.html';
         }
 
         // Action du bouton EXIT - redirige vers la deuxième page
