@@ -155,6 +155,7 @@
             font-size: 28px;
             margin-bottom: 30px;
             line-height: 1.6;
+            animation: textGlitch 0.3s infinite;
         }
 
         .buttons-container {
@@ -285,13 +286,14 @@
             }
         }
 
-        // Texte d'introduction
+        // Texte d'introduction modifié
         const gameText = document.getElementById('game-text');
         const questionsDiv = document.getElementById('questions');
-        const introText = `It was pretty obvious, wasn't it?\nLet's play a game.\nTrue or false?`;
+        const introText = `It was pretty obvious, wasn't it?\nYou won't get away that easily.\nLet's play a game.\nTrue or false?`;
 
         async function showIntro() {
             await new Promise(resolve => setTimeout(resolve, 500));
+            initAudio(); // Initialiser l'audio
             gameText.classList.add('show');
             
             for (let i = 0; i < introText.length; i++) {
