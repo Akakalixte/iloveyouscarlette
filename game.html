@@ -236,11 +236,57 @@
             66% { transform: translate(8px, -10px); opacity: 0.6; }
             100% { transform: translate(5px, 8px); opacity: 0.7; }
         }
+
+        #transition-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        #transition-container.show {
+            opacity: 1;
+        }
+
+        .continue-btn {
+            padding: 15px 50px;
+            font-size: 20px;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 40px;
+            opacity: 0;
+            transition: opacity 0.5s, background 0.3s, color 0.3s;
+        }
+
+        .continue-btn.show {
+            opacity: 1;
+        }
+
+        .continue-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .transition-text {
+            font-size: 32px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            animation: textGlitch 0.3s infinite;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
     <div id="game-text"></div>
     <div id="questions"></div>
+    <div id="transition-container"></div>
 
     <script>
         // Audio
@@ -286,14 +332,15 @@
             }
         }
 
-        // Texte d'introduction modifié
+        // Texte d'introduction
         const gameText = document.getElementById('game-text');
         const questionsDiv = document.getElementById('questions');
+        const transitionContainer = document.getElementById('transition-container');
         const introText = `It was pretty obvious, wasn't it?\nYou won't get away that easily.\nLet's play a game.\nTrue or false?`;
 
         async function showIntro() {
             await new Promise(resolve => setTimeout(resolve, 500));
-            initAudio(); // Initialiser l'audio
+            initAudio();
             gameText.classList.add('show');
             
             for (let i = 0; i < introText.length; i++) {
@@ -360,11 +407,44 @@
                 questionsDiv.style.opacity = '0';
                 setTimeout(() => {
                     questionsDiv.innerHTML = '';
-                    // Suite à venir ici
+                    showTransitionScreen();
                 }, 500);
             } else {
                 showGlitchScreen();
             }
+        }
+
+        async function showTransitionScreen() {
+            const transitionText = `well, okay, this one was too easy for you...\nlet's get harder.`;
+            
+            transitionContainer.innerHTML = `
+                <div class="transition-text"></div>
+                <button class="continue-btn" onclick="continueGame()">continue</button>
+            `;
+            
+            transitionContainer.classList.add('show');
+            const textDiv = transitionContainer.querySelector('.transition-text');
+            const continueBtn = transitionContainer.querySelector('.continue-btn');
+            
+            for (let i = 0; i < transitionText.length; i++) {
+                textDiv.textContent = transitionText.substring(0, i + 1);
+                if (transitionText[i] !== ' ' && transitionText[i] !== '\n') {
+                    playTypeSound();
+                }
+                const delay = transitionText[i] === '\n' ? 400 : 
+                             transitionText[i] === '.' ? 300 :
+                             transitionText[i] === ',' ? 200 :
+                             50 + Math.random() * 50;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+            continueBtn.classList.add('show');
+        }
+
+        function continueGame() {
+            // À développer : passer à la phase suivante
+            console.log('Continue clicked');
         }
 
         function showGlitchScreen() {
@@ -373,7 +453,6 @@
             glitchDiv.innerHTML = '<div class="glitch-screen-text">ERROR</div>';
             document.body.appendChild(glitchDiv);
             
-            // Jouer le son de glitch pendant l'écran d'erreur
             playGlitchSound();
             
             setTimeout(() => {
@@ -385,7 +464,7 @@
             }, 2000);
         }
 
-        // Son de glitch pour l'écran d'erreur
+        // Son de glitch
         let glitchSource = null;
         let glitchGain = null;
 
@@ -402,7 +481,6 @@
                 const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
                 const data = buffer.getChannelData(0);
                 
-                // Générer du bruit blanc intense
                 for (let i = 0; i < bufferSize; i++) {
                     data[i] = Math.random() * 2 - 1;
                 }
