@@ -327,7 +327,7 @@ I have faith in you, I know you can do it.`;
 
             stopGlitchSound();
 
-            // Flash blanc (même effet qu'avant)
+            // Flash blanc
             document.body.style.transition = 'background 0.1s';
             document.body.style.background = '#fff';
 
@@ -336,20 +336,74 @@ I have faith in you, I know you can do it.`;
 
                 setTimeout(() => {
                     // ── Lancement Roblox ──────────────────────────────────────
-                    // 1. On tente d'ouvrir l'application via le protocole URI
-                    //    (identique au bouton "Rejoindre" officiel de Roblox)
-                    window.location.href = ROBLOX_DEEP_LINK;
+                    // 1. Tente de lancer l'app Roblox via le protocole URI
+                    //    window.open est plus fiable que location.href pour les deep links
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = ROBLOX_DEEP_LINK;
+                    document.body.appendChild(iframe);
 
-                    // 2. Si l'app n'est pas installée, le navigateur ne change
-                    //    pas de page → on redirige vers la page web du jeu
-                    //    après un court délai (comportement identique à Roblox)
+                    // 2. Fallback : affiche un lien cliquable si l'app ne s'ouvre pas
                     setTimeout(() => {
-                        window.location.href = ROBLOX_WEB_URL;
-                    }, 2000);
+                        document.body.removeChild(iframe);
+                        showFallback();
+                    }, 2500);
                     // ─────────────────────────────────────────────────────────
                 }, 100);
             }, 100);
         });
+
+        function showFallback() {
+            // Crée un overlay de fallback dans le style du jeu
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                font-family: 'Courier New', monospace;
+                color: #fff;
+                animation: fadeInFallback 0.8s ease forwards;
+            `;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInFallback {
+                    from { opacity: 0; transform: translate(-50%, -48%); }
+                    to   { opacity: 1; transform: translate(-50%, -50%); }
+                }
+                #fallback-link {
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 14px 40px;
+                    font-size: 20px;
+                    font-family: 'Courier New', monospace;
+                    background: #000;
+                    color: #fff;
+                    border: 2px solid #fff;
+                    text-decoration: none;
+                    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+                    transition: box-shadow 0.2s;
+                }
+                #fallback-link:hover {
+                    box-shadow: 0 0 30px rgba(255,0,0,0.5), 0 0 50px rgba(0,255,255,0.4);
+                }
+            `;
+            document.head.appendChild(style);
+
+            overlay.innerHTML = `
+                <div style="font-size:18px; opacity:0.7; margin-bottom:10px;">
+                    Roblox n'a pas répondu.
+                </div>
+                <div style="font-size:14px; opacity:0.5; margin-bottom:24px;">
+                    Clique ci-dessous pour rejoindre le jeu :
+                </div>
+                <a id="fallback-link" href="${ROBLOX_WEB_URL}" target="_blank">
+                    rejoindre le jeu →
+                </a>
+            `;
+            document.body.appendChild(overlay);
+        }
 
         // Démarrer
         setTimeout(() => {
