@@ -123,45 +123,18 @@
         }
 
         @keyframes glitchRed {
-            0% {
-                transform: translate(-3px, -3px);
-                opacity: 0.8;
-            }
-            25% {
-                transform: translate(5px, 2px);
-                opacity: 0.7;
-            }
-            50% {
-                transform: translate(-2px, 4px);
-                opacity: 0.9;
-            }
-            75% {
-                transform: translate(4px, -2px);
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(-3px, 3px);
-                opacity: 0.8;
-            }
+            0% { transform: translate(-3px, -3px); opacity: 0.8; }
+            25% { transform: translate(5px, 2px); opacity: 0.7; }
+            50% { transform: translate(-2px, 4px); opacity: 0.9; }
+            75% { transform: translate(4px, -2px); opacity: 0.6; }
+            100% { transform: translate(-3px, 3px); opacity: 0.8; }
         }
 
         @keyframes glitchBlue {
-            0% {
-                transform: translate(3px, 3px);
-                opacity: 0.7;
-            }
-            33% {
-                transform: translate(-4px, -2px);
-                opacity: 0.8;
-            }
-            66% {
-                transform: translate(2px, -4px);
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(3px, 2px);
-                opacity: 0.7;
-            }
+            0% { transform: translate(3px, 3px); opacity: 0.7; }
+            33% { transform: translate(-4px, -2px); opacity: 0.8; }
+            66% { transform: translate(2px, -4px); opacity: 0.6; }
+            100% { transform: translate(3px, 2px); opacity: 0.7; }
         }
 
         @keyframes glitchText {
@@ -206,11 +179,20 @@
         const textContainer = document.getElementById('text-container');
         const exitButton = document.getElementById('exit-button');
 
-        // Texte à afficher
         const text = `Did you really think I was just going to do that?
 No.
 You're going to have to escape.
 I have faith in you, I know you can do it.`;
+
+        // ── Roblox game info ──────────────────────────────────────────────────
+        // Place ID extrait de l'URL : https://www.roblox.com/fr/games/126217917857985/Do-NOT-join
+        const ROBLOX_PLACE_ID = '126217917857985';
+        const ROBLOX_WEB_URL  = `https://www.roblox.com/fr/games/${ROBLOX_PLACE_ID}/Do-NOT-join`;
+
+        // L'URI roblox:// est le même mécanisme que le bouton "Rejoindre" officiel.
+        // Format : roblox://experiences/start?placeId=XXXXX
+        const ROBLOX_DEEP_LINK = `roblox://experiences/start?placeId=${ROBLOX_PLACE_ID}`;
+        // ──────────────────────────────────────────────────────────────────────
 
         // Audio context
         let audioContext = null;
@@ -225,29 +207,27 @@ I have faith in you, I know you can do it.`;
         function playTypeSound() {
             try {
                 const ctx = initAudio();
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
-                
+                if (ctx.state === 'suspended') ctx.resume();
+
                 const oscillator = ctx.createOscillator();
-                const gainNode = ctx.createGain();
-                const filter = ctx.createBiquadFilter();
-                
+                const gainNode   = ctx.createGain();
+                const filter     = ctx.createBiquadFilter();
+
                 oscillator.connect(filter);
                 filter.connect(gainNode);
                 gainNode.connect(ctx.destination);
-                
+
                 oscillator.frequency.value = 700 + Math.random() * 300;
                 oscillator.type = 'square';
-                
+
                 filter.type = 'lowpass';
                 filter.frequency.value = 2000;
                 filter.Q.value = 1;
-                
+
                 const now = ctx.currentTime;
                 gainNode.gain.setValueAtTime(0.2, now);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                
+
                 oscillator.start(now);
                 oscillator.stop(now + 0.1);
             } catch (e) {
@@ -255,77 +235,65 @@ I have faith in you, I know you can do it.`;
             }
         }
 
-        // Animation machine à écrire
         async function typeWriter() {
             textContainer.classList.add('show');
-            
+
             for (let i = 0; i < text.length; i++) {
                 textContainer.textContent = text.substring(0, i + 1);
-                
-                if (text[i] !== ' ' && text[i] !== '\n') {
-                    playTypeSound();
-                }
-                
-                const delay = text[i] === '\n' ? 400 : 
-                             text[i] === '.' ? 300 :
-                             text[i] === ',' ? 200 :
-                             50 + Math.random() * 50;
-                
+
+                if (text[i] !== ' ' && text[i] !== '\n') playTypeSound();
+
+                const delay = text[i] === '\n' ? 400 :
+                              text[i] === '.'  ? 300 :
+                              text[i] === ','  ? 200 :
+                              50 + Math.random() * 50;
+
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
-            
+
             await new Promise(resolve => setTimeout(resolve, 2000));
-            
+
             textContainer.classList.add('fade-out');
             await new Promise(resolve => setTimeout(resolve, 1000));
-            
+
             textContainer.style.display = 'none';
             exitButton.style.display = 'block';
-            setTimeout(() => {
-                exitButton.classList.add('show');
-            }, 50);
+            setTimeout(() => exitButton.classList.add('show'), 50);
         }
 
-        // Son de glitch continu
+        // Glitch sound ─────────────────────────────────────────────────────────
         let glitchSource = null;
-        let glitchGain = null;
+        let glitchGain   = null;
 
         function startGlitchSound() {
             if (glitchSource) return;
-            
             try {
                 const ctx = initAudio();
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
-                
+                if (ctx.state === 'suspended') ctx.resume();
+
                 const bufferSize = ctx.sampleRate * 2;
-                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                
-                glitchSource = ctx.createBufferSource();
+                const buffer     = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data       = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+                glitchSource        = ctx.createBufferSource();
                 glitchSource.buffer = buffer;
-                glitchSource.loop = true;
-                
-                glitchGain = ctx.createGain();
-                const filter = ctx.createBiquadFilter();
-                
-                filter.type = 'bandpass';
+                glitchSource.loop   = true;
+
+                glitchGain      = ctx.createGain();
+                const filter    = ctx.createBiquadFilter();
+                filter.type     = 'bandpass';
                 filter.frequency.value = 3000;
-                filter.Q.value = 0.5;
-                
+                filter.Q.value  = 0.5;
+
                 glitchSource.connect(filter);
                 filter.connect(glitchGain);
                 glitchGain.connect(ctx.destination);
-                
+
                 const now = ctx.currentTime;
                 glitchGain.gain.setValueAtTime(0, now);
                 glitchGain.gain.linearRampToValueAtTime(0.15, now + 0.05);
-                
+
                 glitchSource.start(now);
             } catch (e) {
                 console.log('Glitch audio:', e.message);
@@ -334,52 +302,56 @@ I have faith in you, I know you can do it.`;
 
         function stopGlitchSound() {
             if (!glitchSource || !glitchGain) return;
-            
             try {
                 const ctx = initAudio();
                 const now = ctx.currentTime;
-                
                 glitchGain.gain.cancelScheduledValues(now);
                 glitchGain.gain.setValueAtTime(glitchGain.gain.value, now);
                 glitchGain.gain.linearRampToValueAtTime(0, now + 0.1);
-                
                 setTimeout(() => {
-                    if (glitchSource) {
-                        glitchSource.stop();
-                        glitchSource = null;
-                        glitchGain = null;
-                    }
+                    if (glitchSource) { glitchSource.stop(); glitchSource = null; glitchGain = null; }
                 }, 150);
             } catch (e) {
                 glitchSource = null;
-                glitchGain = null;
+                glitchGain   = null;
             }
         }
 
-        // Events du bouton
+        // Button events ────────────────────────────────────────────────────────
         exitButton.addEventListener('mouseenter', startGlitchSound);
         exitButton.addEventListener('mouseleave', stopGlitchSound);
 
-        exitButton.addEventListener('click', function(e) {
+        exitButton.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            
-            console.log('Button clicked - redirecting to game.html');
+
             stopGlitchSound();
-            
-            // Flash blanc
+
+            // Flash blanc (même effet qu'avant)
             document.body.style.transition = 'background 0.1s';
             document.body.style.background = '#fff';
-            
+
             setTimeout(() => {
                 document.body.style.background = '#000';
+
                 setTimeout(() => {
-                    window.location.href = 'game.html';
+                    // ── Lancement Roblox ──────────────────────────────────────
+                    // 1. On tente d'ouvrir l'application via le protocole URI
+                    //    (identique au bouton "Rejoindre" officiel de Roblox)
+                    window.location.href = ROBLOX_DEEP_LINK;
+
+                    // 2. Si l'app n'est pas installée, le navigateur ne change
+                    //    pas de page → on redirige vers la page web du jeu
+                    //    après un court délai (comportement identique à Roblox)
+                    setTimeout(() => {
+                        window.location.href = ROBLOX_WEB_URL;
+                    }, 2000);
+                    // ─────────────────────────────────────────────────────────
                 }, 100);
             }, 100);
         });
 
-        // Démarrer l'animation
+        // Démarrer
         setTimeout(() => {
             initAudio();
             typeWriter();
