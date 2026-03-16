@@ -39,7 +39,7 @@
             opacity: 0;
         }
 
-        #exit-button {
+        #continuer-button {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -57,11 +57,11 @@
             display: none;
         }
 
-        #exit-button.show {
+        #continuer-button.show {
             opacity: 1;
         }
 
-        #exit-button:hover {
+        #continuer-button:hover {
             box-shadow: 
                 0 0 20px rgba(255, 0, 0, 0.5),
                 0 0 40px rgba(0, 255, 255, 0.5),
@@ -69,9 +69,9 @@
             animation: glitchButton 0.1s infinite, glitchText 0.15s infinite;
         }
 
-        #exit-button:hover::before,
-        #exit-button:hover::after {
-            content: 'exit';
+        #continuer-button:hover::before,
+        #continuer-button:hover::after {
+            content: 'continuer';
             position: absolute;
             top: 0;
             left: 0;
@@ -83,118 +83,114 @@
             padding: 20px 60px;
         }
 
-        #exit-button:hover::before {
+        #continuer-button:hover::before {
             animation: glitchRed 0.2s infinite;
             color: #ff0000;
             z-index: -1;
         }
 
-        #exit-button:hover::after {
+        #continuer-button:hover::after {
             animation: glitchBlue 0.3s infinite;
             color: #00ffff;
             z-index: -2;
         }
 
         @keyframes glitchButton {
-            0% {
-                transform: translate(-50%, -50%);
-                filter: hue-rotate(0deg);
-            }
-            20% {
-                transform: translate(calc(-50% - 5px), calc(-50% + 5px));
-                filter: hue-rotate(90deg);
-            }
-            40% {
-                transform: translate(calc(-50% + 3px), calc(-50% - 3px));
-                filter: hue-rotate(180deg);
-            }
-            60% {
-                transform: translate(calc(-50% - 2px), calc(-50% - 4px));
-                filter: hue-rotate(270deg);
-            }
-            80% {
-                transform: translate(calc(-50% + 4px), calc(-50% + 2px));
-                filter: hue-rotate(45deg);
-            }
-            100% {
-                transform: translate(-50%, -50%);
-                filter: hue-rotate(360deg);
-            }
+            0%   { transform: translate(-50%, -50%);                         filter: hue-rotate(0deg);   }
+            20%  { transform: translate(calc(-50% - 5px), calc(-50% + 5px)); filter: hue-rotate(90deg);  }
+            40%  { transform: translate(calc(-50% + 3px), calc(-50% - 3px)); filter: hue-rotate(180deg); }
+            60%  { transform: translate(calc(-50% - 2px), calc(-50% - 4px)); filter: hue-rotate(270deg); }
+            80%  { transform: translate(calc(-50% + 4px), calc(-50% + 2px)); filter: hue-rotate(45deg);  }
+            100% { transform: translate(-50%, -50%);                         filter: hue-rotate(360deg); }
         }
 
         @keyframes glitchRed {
-            0% { transform: translate(-3px, -3px); opacity: 0.8; }
-            25% { transform: translate(5px, 2px); opacity: 0.7; }
-            50% { transform: translate(-2px, 4px); opacity: 0.9; }
-            75% { transform: translate(4px, -2px); opacity: 0.6; }
-            100% { transform: translate(-3px, 3px); opacity: 0.8; }
+            0%   { transform: translate(-3px, -3px); opacity: 0.8; }
+            25%  { transform: translate(5px, 2px);   opacity: 0.7; }
+            50%  { transform: translate(-2px, 4px);  opacity: 0.9; }
+            75%  { transform: translate(4px, -2px);  opacity: 0.6; }
+            100% { transform: translate(-3px, 3px);  opacity: 0.8; }
         }
 
         @keyframes glitchBlue {
-            0% { transform: translate(3px, 3px); opacity: 0.7; }
-            33% { transform: translate(-4px, -2px); opacity: 0.8; }
-            66% { transform: translate(2px, -4px); opacity: 0.6; }
-            100% { transform: translate(3px, 2px); opacity: 0.7; }
+            0%   { transform: translate(3px, 3px);   opacity: 0.7; }
+            33%  { transform: translate(-4px, -2px); opacity: 0.8; }
+            66%  { transform: translate(2px, -4px);  opacity: 0.6; }
+            100% { transform: translate(3px, 2px);   opacity: 0.7; }
         }
 
         @keyframes glitchText {
-            0% {
-                text-shadow: 
-                    -2px -2px 0 #ff0000,
-                    2px 2px 0 #00ffff,
-                    0 0 10px #ffff00;
-            }
-            25% {
-                text-shadow: 
-                    2px -2px 0 #ff0000,
-                    -2px 2px 0 #00ffff,
-                    3px 0 15px #ffff00;
-            }
-            50% {
-                text-shadow: 
-                    -3px 2px 0 #ff0000,
-                    3px -2px 0 #00ffff,
-                    -2px 0 20px #ffff00;
-            }
-            75% {
-                text-shadow: 
-                    2px 3px 0 #ff0000,
-                    -2px -3px 0 #00ffff,
-                    0 3px 15px #ffff00;
-            }
-            100% {
-                text-shadow: 
-                    -2px -2px 0 #ff0000,
-                    2px 2px 0 #00ffff,
-                    0 0 10px #ffff00;
-            }
+            0%   { text-shadow: -2px -2px 0 #ff0000,  2px  2px 0 #00ffff,  0    0   10px #ffff00; }
+            25%  { text-shadow:  2px -2px 0 #ff0000, -2px  2px 0 #00ffff,  3px  0   15px #ffff00; }
+            50%  { text-shadow: -3px  2px 0 #ff0000,  3px -2px 0 #00ffff, -2px  0   20px #ffff00; }
+            75%  { text-shadow:  2px  3px 0 #ff0000, -2px -3px 0 #00ffff,  0    3px 15px #ffff00; }
+            100% { text-shadow: -2px -2px 0 #ff0000,  2px  2px 0 #00ffff,  0    0   10px #ffff00; }
+        }
+
+        /* Fallback si Roblox n'est pas installé */
+        #fallback-overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+
+        #fallback-overlay.show {
+            display: block;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        #fallback-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 14px 40px;
+            font-size: 20px;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+            text-decoration: none;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transition: box-shadow 0.2s;
+        }
+
+        #fallback-link:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5), 0 0 50px rgba(0, 255, 255, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -48%); }
+            to   { opacity: 1; transform: translate(-50%, -50%); }
         }
     </style>
 </head>
 <body>
     <div id="text-container"></div>
-    <button id="exit-button">exit</button>
+    <button id="continuer-button">continuer</button>
+    <div id="fallback-overlay">
+        <div style="font-size:18px; opacity:0.7; margin-bottom:10px;">Roblox n'a pas répondu.</div>
+        <div style="font-size:14px; opacity:0.5; margin-bottom:24px;">Clique ci-dessous pour rejoindre le jeu :</div>
+        <a id="fallback-link" href="https://www.roblox.com/fr/games/126217917857985/Do-NOT-join" target="_blank">rejoindre le jeu →</a>
+    </div>
 
     <script>
-        const textContainer = document.getElementById('text-container');
-        const exitButton = document.getElementById('exit-button');
+        const textContainer   = document.getElementById('text-container');
+        const continuerButton = document.getElementById('continuer-button');
+        const fallbackOverlay = document.getElementById('fallback-overlay');
 
+        const ROBLOX_DEEP_LINK = 'roblox://experiences/start?placeId=126217917857985';
+
+        // Texte à afficher
         const text = `Did you really think I was just going to do that?
 No.
 You're going to have to escape.
 I have faith in you, I know you can do it.`;
 
-        // ── Roblox game info ──────────────────────────────────────────────────
-        // Place ID extrait de l'URL : https://www.roblox.com/fr/games/126217917857985/Do-NOT-join
-        const ROBLOX_PLACE_ID = '126217917857985';
-        const ROBLOX_WEB_URL  = `https://www.roblox.com/fr/games/${ROBLOX_PLACE_ID}/Do-NOT-join`;
-
-        // L'URI roblox:// est le même mécanisme que le bouton "Rejoindre" officiel.
-        // Format : roblox://experiences/start?placeId=XXXXX
-        const ROBLOX_DEEP_LINK = `roblox://experiences/start?placeId=${ROBLOX_PLACE_ID}`;
-        // ──────────────────────────────────────────────────────────────────────
-
-        // Audio context
+        // ── Audio ─────────────────────────────────────────────────────────────
         let audioContext = null;
 
         function initAudio() {
@@ -219,7 +215,6 @@ I have faith in you, I know you can do it.`;
 
                 oscillator.frequency.value = 700 + Math.random() * 300;
                 oscillator.type = 'square';
-
                 filter.type = 'lowpass';
                 filter.frequency.value = 2000;
                 filter.Q.value = 1;
@@ -227,41 +222,36 @@ I have faith in you, I know you can do it.`;
                 const now = ctx.currentTime;
                 gainNode.gain.setValueAtTime(0.2, now);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-
                 oscillator.start(now);
                 oscillator.stop(now + 0.1);
-            } catch (e) {
-                console.log('Audio:', e.message);
-            }
+            } catch (e) {}
         }
 
+        // ── Machine à écrire ─────────────────────────────────────────────────
         async function typeWriter() {
             textContainer.classList.add('show');
 
             for (let i = 0; i < text.length; i++) {
                 textContainer.textContent = text.substring(0, i + 1);
-
                 if (text[i] !== ' ' && text[i] !== '\n') playTypeSound();
 
                 const delay = text[i] === '\n' ? 400 :
                               text[i] === '.'  ? 300 :
                               text[i] === ','  ? 200 :
                               50 + Math.random() * 50;
-
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
 
             await new Promise(resolve => setTimeout(resolve, 2000));
-
             textContainer.classList.add('fade-out');
             await new Promise(resolve => setTimeout(resolve, 1000));
-
             textContainer.style.display = 'none';
-            exitButton.style.display = 'block';
-            setTimeout(() => exitButton.classList.add('show'), 50);
+
+            continuerButton.style.display = 'block';
+            setTimeout(() => continuerButton.classList.add('show'), 50);
         }
 
-        // Glitch sound ─────────────────────────────────────────────────────────
+        // ── Son glitch au survol ──────────────────────────────────────────────
         let glitchSource = null;
         let glitchGain   = null;
 
@@ -280,11 +270,11 @@ I have faith in you, I know you can do it.`;
                 glitchSource.buffer = buffer;
                 glitchSource.loop   = true;
 
-                glitchGain      = ctx.createGain();
-                const filter    = ctx.createBiquadFilter();
-                filter.type     = 'bandpass';
+                glitchGain   = ctx.createGain();
+                const filter = ctx.createBiquadFilter();
+                filter.type  = 'bandpass';
                 filter.frequency.value = 3000;
-                filter.Q.value  = 0.5;
+                filter.Q.value = 0.5;
 
                 glitchSource.connect(filter);
                 filter.connect(glitchGain);
@@ -293,11 +283,8 @@ I have faith in you, I know you can do it.`;
                 const now = ctx.currentTime;
                 glitchGain.gain.setValueAtTime(0, now);
                 glitchGain.gain.linearRampToValueAtTime(0.15, now + 0.05);
-
                 glitchSource.start(now);
-            } catch (e) {
-                console.log('Glitch audio:', e.message);
-            }
+            } catch (e) {}
         }
 
         function stopGlitchSound() {
@@ -317,14 +304,12 @@ I have faith in you, I know you can do it.`;
             }
         }
 
-        // Button events ────────────────────────────────────────────────────────
-        exitButton.addEventListener('mouseenter', startGlitchSound);
-        exitButton.addEventListener('mouseleave', stopGlitchSound);
+        // ── Clic → lancement Roblox ───────────────────────────────────────────
+        continuerButton.addEventListener('mouseenter', startGlitchSound);
+        continuerButton.addEventListener('mouseleave', stopGlitchSound);
 
-        exitButton.addEventListener('click', function (e) {
+        continuerButton.addEventListener('click', function (e) {
             e.preventDefault();
-            e.stopPropagation();
-
             stopGlitchSound();
 
             // Flash blanc
@@ -335,77 +320,23 @@ I have faith in you, I know you can do it.`;
                 document.body.style.background = '#000';
 
                 setTimeout(() => {
-                    // ── Lancement Roblox ──────────────────────────────────────
-                    // 1. Tente de lancer l'app Roblox via le protocole URI
-                    //    window.open est plus fiable que location.href pour les deep links
+                    // Tente d'ouvrir l'app Roblox via deep link (iframe invisible)
                     const iframe = document.createElement('iframe');
                     iframe.style.display = 'none';
                     iframe.src = ROBLOX_DEEP_LINK;
                     document.body.appendChild(iframe);
 
-                    // 2. Fallback : affiche un lien cliquable si l'app ne s'ouvre pas
+                    // Après 2,5s : si l'app n'a pas répondu → fallback lien web
                     setTimeout(() => {
                         document.body.removeChild(iframe);
-                        showFallback();
+                        continuerButton.style.display = 'none';
+                        fallbackOverlay.classList.add('show');
                     }, 2500);
-                    // ─────────────────────────────────────────────────────────
                 }, 100);
             }, 100);
         });
 
-        function showFallback() {
-            // Crée un overlay de fallback dans le style du jeu
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 50%; left: 50%;
-                transform: translate(-50%, -50%);
-                text-align: center;
-                font-family: 'Courier New', monospace;
-                color: #fff;
-                animation: fadeInFallback 0.8s ease forwards;
-            `;
-
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes fadeInFallback {
-                    from { opacity: 0; transform: translate(-50%, -48%); }
-                    to   { opacity: 1; transform: translate(-50%, -50%); }
-                }
-                #fallback-link {
-                    display: inline-block;
-                    margin-top: 20px;
-                    padding: 14px 40px;
-                    font-size: 20px;
-                    font-family: 'Courier New', monospace;
-                    background: #000;
-                    color: #fff;
-                    border: 2px solid #fff;
-                    text-decoration: none;
-                    box-shadow: 0 0 20px rgba(255,255,255,0.3);
-                    transition: box-shadow 0.2s;
-                }
-                #fallback-link:hover {
-                    box-shadow: 0 0 30px rgba(255,0,0,0.5), 0 0 50px rgba(0,255,255,0.4);
-                }
-            `;
-            document.head.appendChild(style);
-
-            overlay.innerHTML = `
-                <div style="font-size:18px; opacity:0.7; margin-bottom:10px;">
-                    Roblox n'a pas répondu.
-                </div>
-                <div style="font-size:14px; opacity:0.5; margin-bottom:24px;">
-                    Clique ci-dessous pour rejoindre le jeu :
-                </div>
-                <a id="fallback-link" href="${ROBLOX_WEB_URL}" target="_blank">
-                    rejoindre le jeu →
-                </a>
-            `;
-            document.body.appendChild(overlay);
-        }
-
-        // Démarrer
+        // ── Démarrer ──────────────────────────────────────────────────────────
         setTimeout(() => {
             initAudio();
             typeWriter();
